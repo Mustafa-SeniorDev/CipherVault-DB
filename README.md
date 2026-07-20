@@ -1,47 +1,37 @@
-# CipherVault-DB
-An enterprise-grade data encryption layer for relational databases. Implements AES-256 GCM encryption to ensure Data-at-Rest security and PII protection."
-# CipherVault-DB
+# ZK-Verifier Point-Validation Checker
 
-Enterprise-grade encryption layer for protecting Personally Identifiable Information (PII) within relational databases.
+## Summary
 
-## Features
+An open-source detection tool for a recurring vulnerability class in ZK-verifier implementations: missing on-curve and subgroup-membership validation for elliptic-curve points (e.g. BN254 G1/G2) accepted as proof inputs.
 
-- **AES-256-GCM** encryption for column-level data protection
-- **Key management** with secure key rotation
-- **PostgreSQL** and **MySQL** support
-- **Zero-downtime encryption** for existing tables
-- **Audit logging** for all encryption operations
+This tool grew out of independent research into zkVerify's `read_g2` function and Zeko Protocol's authorization logic — both cases where security-critical validation was silently missing without causing an obvious failure.
 
-## Quick Start
+**Status:** Early development · Scaffold and detection logic in progress
 
-```bash
-git clone https://github.com/Mustafa-SeniorDev/ciphervault-db.git
-cd ciphervault-db
-pip install -r requirements.txt
-python src/main.py
-Technical Architecture
+## Motivation
 
-· Encrypts data before writing to database
-· Stores encryption keys in separate key store (environment variables / KMS)
-· Implements authenticated encryption (GCM mode)
-· Base64 encoding for safe storage in VARCHAR columns
+Pairing-based commitment schemes (KZG and similar) are foundational to zk-Rollups, zk-coprocessors, and cross-chain ZK bridges. Their soundness depends on every input point being validated as on-curve and in the correct prime-order subgroup — a check that is easy to omit and rarely covered by standard unit tests. This tool lets any team building ZK-verifier pallets or libraries check their own code for this gap.
 
-Performance
+## Planned Scope
 
-· <5ms overhead per encryption operation
-· Parallel processing for bulk operations
-· Connection pooling support for high-throughput systems
+- [ ] Static analysis pass for Rust/Arkworks codebases: flag point-deserialization functions lacking `is_on_curve()` / subgroup-check calls
+- [ ] Static analysis pass for Substrate pallets using similar deserialization patterns
+- [ ] Dynamic test-vector generator: off-curve and non-subgroup BN254 points for use against live/testnet verifier instances
+- [ ] CLI tool (`cargo run -- check <path>`) with human-readable findings output
+- [ ] Documentation and worked examples, including the original zkVerify `read_g2` case
 
-Use Cases
+## Background Research
 
-· Protecting PII in compliance with GDPR, CCPA, PCI-DSS
-· Securing healthcare records (HIPAA)
-· Financial transaction data protection
+This tool is informed directly by two confirmed/ongoing findings:
+- [zkVerify BN254 Point-Validation Research](https://github.com/Mustafa-SeniorDev/zkVerify-BN254-PointValidation-Research)
+- [Zeko Protocol Fee-Payer Authorization Research](https://github.com/Mustafa-SeniorDev/Zeko-Protocol-FeePayer-Authorization-Research)
 
-License
+## License
 
-MIT
+MIT — freely usable and extensible by any team in the ZK ecosystem.
 
-Author
+## Author
 
-Mustafa Ramadhani – Senior Quantitative Systems & Data Engineer
+**Mustafa Ramadhani** — Independent security researcher, Dar es Salaam, Tanzania
+Focus: ZK protocol security & smart contract auditing (Immunefi ecosystem)
+📫 Mustafarama405@gmail.com · [LinkedIn](https://www.linkedin.com/in/mustafa-ramadhani-59394b354)
